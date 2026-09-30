@@ -21,6 +21,68 @@ Ask your agent to harvest or reap comments, or invoke the skill directly with an
 
 The skill runs on its own from start to finish. It doesn't commit anything. Review the result with `git diff`.
 
+## Example
+
+Before:
+
+```php
+/**
+ * The attributes that are mass assignable.
+ *
+ * @var list<string>
+ */
+protected $fillable = ['user_id', 'total_cents'];
+
+/**
+ * This method is responsible for calculating the total of the order.
+ * We loop through all line items and add them. Note that we must round
+ * each line individually because Stripe rounds per line and totals must
+ * match to the cent. See https://github.com/acme/shop/issues/412.
+ *
+ * @param  array  $lines  The lines
+ * @return int  The total
+ */
+public function total(array $lines): int
+{
+    // initialise the total
+    $total = 0;
+
+    // loop through the lines
+    foreach ($lines as $line) {
+        // $total += $line['price'];
+        $total += (int) round($line['price'] * $line['qty']); // @phpstan-ignore-line
+    }
+
+    // return the total
+    return $total;
+}
+```
+
+After:
+
+```php
+/** @var list<string> */
+protected $fillable = ['user_id', 'total_cents'];
+
+/**
+ * Rounds each line individually because Stripe rounds per line and totals must match to the cent.
+ *
+ * @see https://github.com/acme/shop/issues/412
+ */
+public function total(array $lines): int
+{
+    $total = 0;
+
+    foreach ($lines as $line) {
+        $total += (int) round($line['price'] * $line['qty']); // @phpstan-ignore-line
+    }
+
+    return $total;
+}
+```
+
+The generic `@var` tag, the reason for rounding per line, the issue link and the PHPStan directive all survive. Everything that repeated the code is gone.
+
 ## What it removes
 
 - Comments that narrate the code (`// loop through users`)

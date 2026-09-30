@@ -34,3 +34,7 @@ The skill runs on its own from start to finish. It doesn't commit anything. Revi
 - Type information richer than the native signature (generics, array shapes, `@template`, `@property`/`@method`)
 - Tool directives and runtime annotations (`@phpstan-ignore`, `eslint-disable`, `# noqa`, `//go:build`, Doctrine attributes-in-comments, test annotations)
 - License headers, and `@deprecated`/`@throws`/`@internal`/`@see`
+
+## License
+
+MIT
